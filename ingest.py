@@ -8,7 +8,7 @@ load_dotenv()
 Entrez.api_key = os.getenv('NCBI_API_KEY')
 Entrez.email = os.getenv('EMAIL')
 
-def search_pubmed(query, max_results=1600):
+def search_pubmed(query, max_results=10000):
     print('search term: {query}')
     handle = Entrez.esearch(db="pubmed", term=query, retmax=max_results, usehistory="y")
     record = Entrez.read(handle)
@@ -23,7 +23,7 @@ def fetch_details(id_list):
     return results
 
 def run_pipeline():
-    query = '("cell-free DNA"[MeSH Terms]) AND ("circulating-tumor DNA"[MeSH Terms]) AND ("neoplasms"[MeSH Terms]) AND ("2015"[Date - Publication] : "2026"[Date - Publication])'
+    query = '("cell-free DNA"[MeSH Terms]) OR ("circulating-tumor DNA"[MeSH Terms]) AND ("neoplasms"[MeSH Terms]) AND ("2015"[Date - Publication] : "2026"[Date - Publication])'
     search_results = search_pubmed(query)
     id_list = search_results["IdList"]
     print(f'Downloading a total of {len(id_list)} results')
@@ -60,7 +60,7 @@ def run_pipeline():
 
         time.sleep(1)
 
-    df = pd.Dataframe(all_papers)
+    df = pd.DataFrame(all_papers)
     df.to_csv("data/cfdna_abstracts.csv", index=False)
 
 if __name__ == "__main__":
